@@ -1,16 +1,26 @@
 const express = require('express');
 const log = require('./common/logger');
 
+const DB = require('./db/db_conn');
 
-const app = express();
-let apiRouter = express.Router();
 
-app.use('/app', express.static('build/static'));
-app.use('/api', apiRouter);
 
-apiRouter.get('/', (req, res) => {
-    res.send("hello");
-});
+async function main() {
+    const app = express();
+    let apiRouter = express.Router();
 
-log.info("starting server");
-app.listen(8080);
+    let dbConn = await DB.getDBConn();
+
+    
+    app.use('/app', express.static('build/static'));
+    app.use('/api', apiRouter);
+    
+    apiRouter.get('/', (req, res) => {
+        res.send("hello");
+    });
+    
+    log.info("starting server");
+    app.listen(8080);
+}
+
+main();
