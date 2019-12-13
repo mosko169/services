@@ -12,8 +12,6 @@ async function main() {
 
     let dbConn = new DBConnWrapper(await DB.getDBConn());
 
-    let seac
-    
     app.use('/app', express.static('build/static'));
     app.use('/api', apiRouter);
     

@@ -7,7 +7,7 @@ class Categories {
     }
 
     static async getCategories(dbConn, term, pagination) {
-        let res = await dbConn.paginatedQuery("SELECT * from categories where category_name like $1", "category_name", pagination.skip, pagination.limit, [term + '%']);
+        let res = await dbConn.paginatedQuery("SELECT * from categories where category_name like $1", "category_name", pagination.skip, pagination.limit, [term + "%"]);
         return res.rows;
     }
 }
