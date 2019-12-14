@@ -10,7 +10,7 @@ const CREATE_BUSINESS_TABLE = `CREATE TABLE IF NOT EXISTS public.businesses
 const CREATE_CATEGORIES_TABLE = `CREATE TABLE IF NOT EXISTS public.categories
                                 (
                                     category_id integer NOT NULL,
-                                    category_name character varying COLLATE pg_catalog."default",
+                                    name character varying COLLATE pg_catalog."default",
                                     CONSTRAINT categories_pkey PRIMARY KEY (category_id)
                                 )`;
 

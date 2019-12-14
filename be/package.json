@@ -18,6 +18,7 @@
   "homepage": "https://github.com/mosko169/services#readme",
   "dependencies": {
     "express": "^4.17.1",
+    "knex": "^0.20.4",
     "pg": "^7.14.0"
   }
 }

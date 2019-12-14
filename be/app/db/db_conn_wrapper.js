@@ -1,15 +1,20 @@
-
+const knex = require('knex');
+const Query
 class DBConnWrapper {
     constructor(dbConn) {
         this.dbConn = dbConn;
+        this.queryBuilder = new knex({client: 'pg'});
     }
 
     query(query, params = []) {
         return this.dbConn.query(query, params);
     }
 
+    getQueryBuilder() {
+        return this.queryBuilder;
+    }
+
     static preparePaginatedQuery(query, orderByField, skip, limit, queryParams = []) {
-        let paginatedQuery = query;
         let paginatedParams = Array.from(queryParams);
         paginatedParams.push(orderByField);
         let orderByFieldParamIndex = paginatedParams.length;
@@ -26,9 +31,13 @@ class DBConnWrapper {
         };
     }
 
-    paginatedQuery(query, orderByField, skip, limit, queryParams = []) {
-        let {paginatedQuery, parameters} = DBConnWrapper.preparePaginatedQuery(query, orderByField, skip, limit, queryParams);
-        return this.query(paginatedQuery, parameters);
+    executeRawQuery(query, bindings = []) {
+        return this.query(query, bindings);
+    }
+
+    executePreparedQuery(query, pagination = {}, sorting = {}) {
+        let rawQuery = query.toSQL().toNative();
+        return this.executeRawQuery(rawQuery.sql, rawQuery.bindings);
     }
 }
 
