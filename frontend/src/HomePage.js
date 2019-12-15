@@ -4,9 +4,8 @@ import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNav
 import { BrowserRouter as Router } from 'react-router-dom';
 import axios from 'axios'
 import 'react-dates/initialize';
-import { DateRangePicker, SingleDatePicker, DayPickerRangeController } from 'react-dates';
 import 'react-dates/lib/css/_datepicker.css';
-
+import DateRangePickerWrapper from './dateTimePicker.js'
 
 
 
@@ -34,7 +33,6 @@ export class SearchComponnent extends Component {
         startDate: null, 
         endDate: null, 
         focusedInput: null, 
-        hourRange: {Morning: false, Afternoon: false, Evening: false},
       }
 
       getInfo = () => {
@@ -47,13 +45,6 @@ export class SearchComponnent extends Component {
           })
       }
     
-
-      handleHourRangeChange = (val) =>{
-        this.setState((state) => {
-            state.hourRange[val] = !state.hourRange[val];
-          });
-          {console.log("MORNING " + this.state.hourRange.Morning)};
-      }
     
       handleInputChange = () => {
         this.setState({
@@ -103,7 +94,7 @@ export class SearchComponnent extends Component {
             >
               when ?
             </label>
-            <DateRangePicker
+            <DateRangePickerWrapper
                 startDate={this.state.startDate} // momentPropTypes.momentObj or null,
                 startDateId="your_unique_start_date_id" // PropTypes.string.isRequired,
                 endDate={this.state.endDate} // momentPropTypes.momentObj or null,
@@ -111,17 +102,9 @@ export class SearchComponnent extends Component {
                 onDatesChange={({ startDate, endDate }) => this.setState({ startDate, endDate })} // PropTypes.func.isRequired,
                 focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
                 onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
-                renderCalendarInfo={() => (
-                    <Fragment>
-                    {console.log("RENDER")}
-                    <MDBBtn class={this.state.hourRange.Morning ? null: 'btn btn-outline-default waves-effect'}
-                    onClick={() => {this.handleHourRangeChange("Morning")}}>Morning</MDBBtn>
-                    <MDBBtn class={this.state.hourRange.Afternoon ? null: 'btn btn-outline-default waves-effect'}
-                     onClick={() => {this.handleHourRangeChange("Afternoon")}}>Afternoon</MDBBtn>
-                    <MDBBtn class={this.state.hourRange.Evening ? null: 'btn btn-outline-default waves-effect'}
-                     onClick={() => {this.handleHourRangeChange("Evening")}}>Evening</MDBBtn> 
-                    </Fragment >          
-                  )}
+                renderCalendarInfo={() => {
+                    return (<DayButton/>)
+                  }}
                 />            
                 <br />
             <div className="text-center mt-4">
@@ -137,6 +120,41 @@ export class SearchComponnent extends Component {
   }
 }
 
+
+
+export class DayButton extends Component {
+
+    state= {
+        Morning: false, 
+        Afternoon: false, 
+        Evening: false
+    }
+
+    handleHourRangeChange = (val) =>{
+        this.setState((state) => {
+            let newState = state;
+            newState[val] = !state[val];
+            return newState
+          })
+      }
+
+
+    render() {
+        return(
+            <div>
+            <Fragment>
+            {console.log("RENDER")}
+            <MDBBtn class={this.state.Morning ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
+            onClick={() => this.handleHourRangeChange("Morning")}>Morning</MDBBtn>
+            <MDBBtn class={this.state.Afternoon ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
+             onClick={() => this.handleHourRangeChange("Afternoon")}>Afternoon</MDBBtn>
+            <MDBBtn class={this.state.Evening ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
+             onClick={() => this.handleHourRangeChange("Evening")}>Evening</MDBBtn> 
+            </Fragment >
+            </div>
+        )
+    }
+}
 
 export class Navbar extends Component {
   
