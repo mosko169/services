@@ -16,9 +16,11 @@ const propTypes = {
 }
 
 const defaultProps = {
-  // example props for the demo
+  // example props for the demo\
+  anchorDirection: "left", 
   autoFocus: false,
   autoFocusEndDate: false,
+  block: false, 
   initialStartDate: null,
   initialEndDate: null,
 

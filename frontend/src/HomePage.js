@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBDropdown,
-  MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBIcon, MDBCol, MDBContainer, MDBRow, MDBBtn} from "mdbreact";
+  MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBIcon, MDBCol, MDBContainer, MDBRow, MDBBtn, MDBBadge} from "mdbreact";
 import { BrowserRouter as Router } from 'react-router-dom';
 import axios from 'axios'
 import 'react-dates/initialize';
@@ -23,28 +23,44 @@ const Suggestions = (props) => {
 
 
 export class SearchComponnent extends Component {
-    getPickerValue = (value) => {
-        console.log(value);
-    }
-
-    state = {
-        query: '',
-        results: [], 
-        startDate: null, 
-        endDate: null, 
-        focusedInput: null, 
+    constructor(props) {
+        super(props);
+        this.state = {
+            query: '',
+            results: [], 
+            startDate: null, 
+            endDate: null, 
+            focusedInput: null, 
+            day_part: {Morning: false, Afternoon: false,  Evening: false}, 
+        };
       }
+
+    createButtonRow = () => {
+        const items = []
+        for (var key in this.state.day_part) {
+            if (this.state.day_part[key] == true){
+                items.push(<MDBBadge key={key} pill color="default">{key}</MDBBadge>)            
+            }
+        }
+        return (<div>{items}</div>)
+    }
 
       getInfo = () => {
         axios.get(`${API_URL}?api_key=${API_KEY}&prefix=${this.state.query}&limit=7`)
           .then(({ data }) => {
             this.setState({
-              results: data.data // MusicGraph returns an object named data, 
-                                 // as does axios. So... data.data                             
+              results: data.data                          
             })
           })
       }
     
+      onDayButtonChage = (key,value) => {
+        this.setState(() => {
+            let newState = this.state;
+            newState.day_part[key] = value;
+            return newState
+          })
+      }
     
       handleInputChange = () => {
         this.setState({
@@ -92,7 +108,7 @@ export class SearchComponnent extends Component {
               htmlFor="defaultFormRegisterConfirmEx"
               className="grey-text"
             >
-              when ?
+            when ?
             </label>
             <DateRangePickerWrapper
                 startDate={this.state.startDate} // momentPropTypes.momentObj or null,
@@ -103,13 +119,15 @@ export class SearchComponnent extends Component {
                 focusedInput={this.state.focusedInput} // PropTypes.oneOf([START_DATE, END_DATE]) or null,
                 onFocusChange={focusedInput => this.setState({ focusedInput })} // PropTypes.func.isRequired,
                 renderCalendarInfo={() => {
-                    return (<DayButton/>)
+                    return (<DayButton onChangeDayButton={this.onDayButtonChage} day_part={this.state.day_part}/>)
                   }}
                 />            
                 <br />
+                {this.createButtonRow()}
+                <br />
             <div className="text-center mt-4">
               <MDBBtn outline  color="unique" type="submit">
-                Register
+                Search
               </MDBBtn>
             </div>
           </form>
@@ -123,19 +141,19 @@ export class SearchComponnent extends Component {
 
 
 export class DayButton extends Component {
+    constructor(props) {
+        super(props);
+      }
 
-    state= {
-        Morning: false, 
-        Afternoon: false, 
-        Evening: false
-    }
 
     handleHourRangeChange = (val) =>{
-        this.setState((state) => {
-            let newState = state;
-            newState[val] = !state[val];
+        let new_val = !this.props.day_part[val]
+        this.setState((props) => {
+            let newState = this.props.day_part;
+            newState[val] = new_val;
             return newState
           })
+        this.props.onChangeDayButton(val, new_val);
       }
 
 
@@ -143,12 +161,11 @@ export class DayButton extends Component {
         return(
             <div>
             <Fragment>
-            {console.log("RENDER")}
-            <MDBBtn class={this.state.Morning ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
+            <MDBBtn className={this.props.day_part.Morning ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
             onClick={() => this.handleHourRangeChange("Morning")}>Morning</MDBBtn>
-            <MDBBtn class={this.state.Afternoon ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
+            <MDBBtn className={this.props.day_part.Afternoon ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
              onClick={() => this.handleHourRangeChange("Afternoon")}>Afternoon</MDBBtn>
-            <MDBBtn class={this.state.Evening ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
+            <MDBBtn className={this.props.day_part.Evening ? 'btn-default btn Ripple-parent': 'btn btn-outline-default waves-effect'}
              onClick={() => this.handleHourRangeChange("Evening")}>Evening</MDBBtn> 
             </Fragment >
             </div>
