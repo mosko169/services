@@ -14,6 +14,11 @@ class Middlewares {
         }
         next();
     }
+
+    static parseFilters(req, res, next) {
+        req.filters = req.body.filters || req.query.filters || {};
+        next();
+    }
 }
 
 module.exports = Middlewares;

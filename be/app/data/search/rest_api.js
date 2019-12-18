@@ -5,11 +5,6 @@ const Middlewares = require('../../common/middlewares');
 const Businesses = require('../businesses/businesses');
 const Categories = require('../categories/categories');
 
-function parseFilters(req) {
-// TODO - middleware
-    return [];
-}
-
 function getSearchRouter(dbConn) {
 
     let router = express.Router();
@@ -20,11 +15,9 @@ function getSearchRouter(dbConn) {
         res.send(categories);
     })
 
-    router.get('/businesses', Middlewares.paginate, async (req, res) => {
-        let term = req.query.term;
-        let category = req.query.category;
-        let filters = parseFilters(req);
-        let categories = await Businesses.getBusinesses(dbConn, term, category, filters, req.pagination, req.sorting);
+    router.get('/businesses', Middlewares.paginate, Middlewares.parseFilters, async (req, res) => {
+        let term = req.query.term || req.body.term;
+        let categories = await Businesses.getBusinesses(dbConn, term, req.filters, req.pagination, req.sorting);
         res.send(categories);
     })
 

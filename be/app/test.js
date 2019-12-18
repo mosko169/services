@@ -20,7 +20,7 @@ async function main() {
             .where("categories.name", "=", category);
     }
     query.select("a");
-    query.select("b");
+    query.select("a");
 
     let nativeQuery = query.toSQL().toNative();
     let res = await db.query(nativeQuery.sql, nativeQuery.bindings);

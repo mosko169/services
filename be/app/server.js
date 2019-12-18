@@ -1,4 +1,5 @@
 const express = require('express');
+const bodyparser = require('body-parser');
 const log = require('./common/logger');
 
 const DB = require('./db/db_conn');
@@ -7,6 +8,7 @@ const SearchRouter = require('./data/search/rest_api');
 
 async function main() {
     const app = express();
+    app.use(bodyparser.json());
     let apiRouter = express.Router();
 
     let dbConn = await DB.getDBConn();
