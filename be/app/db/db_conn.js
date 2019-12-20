@@ -21,7 +21,7 @@ class DbConn {
         const pool = new Pool({
             user: 'postgres',
             host: 'localhost',
-            database: 'test',
+            database: 'services',
             password: '123456',
         });
         
