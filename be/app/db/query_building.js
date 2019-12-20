@@ -19,7 +19,7 @@ class QueryBuilding {
     }
 
     static termPattern(term) {
-        return term + WILDCARD;
+        return term == "" ? term : term + WILDCARD;
     }
 
     static fullFieldName(table, fieldName) {
