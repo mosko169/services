@@ -29,7 +29,7 @@ const CREATE_BUSINESSES_CATEGORIES_TABLE = `CREATE TABLE IF NOT EXISTS public.bu
                                                     ON DELETE NO ACTION
                                             )`;
 
-const CREATE_BUSINESSES_OPENING_HOURS_TABLE = `CREATE TABLE IF NOT EXISTS public.businnesses_opening_hours
+const CREATE_BUSINESSES_OPENING_HOURS_TABLE = `CREATE TABLE IF NOT EXISTS public.businesses_opening_hours
                                                 (
                                                     business_id integer NOT NULL,
                                                     day integer,
