@@ -80,4 +80,5 @@ class Businesses {
 
 }
 
+Businesses.BUSINESSES_TABLE_NAME = BUSINESSES_TABLE_NAME;
 module.exports = Businesses;
