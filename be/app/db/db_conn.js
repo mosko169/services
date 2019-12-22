@@ -20,9 +20,9 @@ class DbConn {
     static async getDBConn() {
         const pool = new Pool({
             user: 'postgres',
-            host: 'localhost',
-            database: 'test',
-            password: '123456',
+            host: 'services.cdqtlfsn44ek.eu-central-1.rds.amazonaws.com',
+            database: 'services',
+            password: '1q2w3e4r',
         });
         
         await DbConn._createTablesIfNotExist(pool);
