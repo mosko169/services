@@ -20,7 +20,7 @@ class DbConn {
     static async getDBConn() {
         const pool = new Pool({
             user: 'postgres',
-            host: 'localhost',
+            host: '10.100.102.7',
             database: 'services',
             password: '123456',
         });

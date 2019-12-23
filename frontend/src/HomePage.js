@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import './autosuggest.css'
 import { MDBNavbar, MDBNavbarBrand, MDBNavbarNav, MDBNavItem, MDBNavLink, MDBNavbarToggler, MDBCollapse, MDBDropdown,
   MDBDropdownToggle, MDBDropdownMenu, MDBDropdownItem, MDBIcon, MDBCol, MDBContainer, MDBRow, MDBBtn, MDBBadge} from "mdbreact";
 import { BrowserRouter as Router } from 'react-router-dom';
@@ -6,72 +7,191 @@ import axios from 'axios'
 import 'react-dates/initialize';
 import 'react-dates/lib/css/_datepicker.css';
 import DateRangePickerWrapper from './dateTimePicker.js'
+import Autosuggest from 'react-autosuggest';
 
+const API_URL = 'http://localhost:3000/api/search'
 
+function escapeRegexCharacters(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
-const { API_KEY } = process.env
-const API_URL = 'http://localhost:3000/api/search/categories'
-
-const Suggestions = (props) => {
-    const options = props.results.map(r => (
-      <li key={r.id}>
-        {r.name}
-      </li>
-    ))
-    return <ul>{options}</ul>
+  function getSuggestions(value, uri) {
+    const escapedValue = escapeRegexCharacters(value.trim());
+    
+    if (escapedValue === '') {
+      return [];
+    }
+    return axios.get(`${API_URL}/${uri}?term=${escapedValue}&limit=7`)
+      .then(({ data }) => {
+        return data
+    })
+  }
+  
+  function getSuggestionValue(suggestion) {
+    return suggestion.name;
+  }
+  
+  function renderSuggestion(suggestion) {
+    return (
+      <span>{suggestion.name}</span>
+    );
   }
 
+class SerachCategory extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        value: '',
+        suggestions_category: [], 
+    }
+  }
+  onChange = (event, { newValue, method }) => {
+    this.setState({
+      value: newValue
+    });
+  };
+
+        
+  onSuggestionsFetchRequested = async ({ value }) => {
+    let uri = "categories"
+    this.setState({
+      suggestions_category: await getSuggestions(value, uri)
+    });
+  };
+
+  suggestionSelected = (event, data) => {
+    this.props.onSelectCategory(data.suggestionValue);            
+  }
+
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions_category: []
+    });
+  };
+  render() {
+
+  const { value, suggestions_category } = this.state;
+    const inputProps = {
+      placeholder: "Search for category...",
+      value,
+      onChange: this.onChange
+    };
+    return (
+      <Autosuggest
+      suggestions={suggestions_category}
+      onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+      onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+      getSuggestionValue={getSuggestionValue}
+      renderSuggestion={renderSuggestion}
+      onSuggestionSelected={this.suggestionSelected}
+      inputProps={inputProps} />
+    )
+  }
+}
+
+class SerachServices extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+        value: '',
+        suggestions: [], 
+    }
+  }
+  onChange = (event, { newValue, method }) => {
+    this.setState({
+      value: newValue
+    });
+  };
+
+        
+  onSuggestionsFetchRequested = async ({ value }) => {
+    let uri = "businesses"
+    this.setState({
+      suggestions: await getSuggestions(value, uri)
+    });
+  };
+
+  suggestionSelected = (event, data) => {
+    this.props.onSelectService(data.suggestionValue);            
+  }
+  
+
+  onSuggestionsClearRequested = () => {
+    this.setState({
+      suggestions: []
+    });
+  };
+  render() {
+
+  const { value, suggestions } = this.state;
+    const inputProps = {
+      placeholder: "Search for businesses...",
+      value,
+      onChange: this.onChange
+    };
+    return (
+      <Autosuggest
+      suggestions={suggestions}
+      onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+      onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+      getSuggestionValue={getSuggestionValue}
+      renderSuggestion={renderSuggestion}
+      onSuggestionSelected={this.suggestionSelected}
+      inputProps={inputProps} />
+    )
+  }
+}
 
 export class SearchComponnent extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            query: '',
-            results: [], 
-            startDate: null, 
-            endDate: null, 
-            focusedInput: null, 
-            day_part: {Morning: false, Afternoon: false,  Evening: false}, 
-        };
-      }
-
-    createButtonRow = () => {
-        const items = []
-        for (var key in this.state.day_part) {
-            if (this.state.day_part[key] == true){
-                items.push(<MDBBadge key={key} pill color="default">{key}</MDBBadge>)            
-            }
-        }
-        return (<div>{items}</div>)
+  constructor(props) {
+      super(props);
+      this.state = {
+          startDate: null, 
+          endDate: null, 
+          focusedInput: null, 
+          category: null, 
+          service_search: null, 
+          day_part: {Morning: false, Afternoon: false,  Evening: false}, 
+      };
     }
 
-      getInfo = () => {
-        axios.get(`${API_URL}?term=${this.state.query}&limit=7`)
-          .then(({ data }) => {
-            console.log(data);
-            this.setState({
-              results: data                          
-            })
-          })
-      }
-    
-      onDayButtonChage = (key,value) => {
-        this.setState(() => {
-            let newState = this.state;
-            newState.day_part[key] = value;
-            return newState
-          })
-      }
-    
-      handleInputChange = () => {
-        this.setState({
-          query: this.search.value
-        }, () => {
-          if (this.state.query) {
-            this.getInfo() 
+  createButtonRow = () => {
+      const items = []
+      for (var key in this.state.day_part) {
+          if (this.state.day_part[key] == true){
+              items.push(<MDBBadge key={key} pill color="default">{key}</MDBBadge>)            
           }
-        })
       }
+      return (<div>{items}</div>)
+  }
+    
+  onDayButtonChage = (key,value) => {
+    this.setState(() => {
+        let newState = this.state;
+        newState.day_part[key] = value;
+        return newState
+      })
+  }
+
+  handleCategory = (new_val) => {
+    this.setState({
+      category: new_val
+    });
+  }
+
+  handleService = (new_val) => {
+    this.setState({
+      service_search: new_val
+    });
+  }
+
+  submitSearch = () => {
+    let uri =''
+    axios.get(`${API_URL}/${uri}?term=${escapedValue}`)
+      .then(({ data }) => {
+        console.log(data)
+    })
+  }
 
   render() {
     return (
@@ -83,24 +203,12 @@ export class SearchComponnent extends Component {
             <label htmlFor="defaultFormRegisterConfirmEx" className="grey-text">
               category
             </label>
-            <input
-              placeholder="Search for category..."
-              type="text"
-              id="defaultFormRegisterConfirmEx"
-              className="form-control"
-              ref={input => this.search = input}
-              onChange={this.handleInputChange}
-            />
-            <Suggestions results={this.state.results} />
+              <SerachCategory onSelectCategory={this.handleCategory}/>
             <br />
             <label htmlFor="defaultFormRegisterEmailEx" className="grey-text">
-              search
+              search service
             </label>
-            <input
-              type="text"
-              id="defaultFormRegisterEmailEx"
-              className="form-control"
-            />
+              <SerachServices onSelectService={this.handleService}/>
             <br />
             <label
               htmlFor="defaultFormRegisterConfirmEx"
@@ -124,7 +232,7 @@ export class SearchComponnent extends Component {
                 {this.createButtonRow()}
                 <br />
             <div className="text-center mt-4">
-              <MDBBtn outline  color="unique" type="submit">
+              <MDBBtn outline  color="unique" type="submit" onClick={this.submitSearch()}>
                 Search
               </MDBBtn>
             </div>

@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import  {Example} from './test.js'
 import  {SearchComponnent, Navbar} from './HomePage.js'
 
 
