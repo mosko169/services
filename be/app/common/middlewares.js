@@ -19,6 +19,12 @@ class Middlewares {
         req.filters = req.body.filters || req.query.filters || {};
         next();
     }
+
+    static parseUserId(req, res, next) {
+        let userId = req.query.userId || req.body.userId;
+        req.userDetails = {userId: userId};
+        next();
+    }
 }
 
 module.exports = Middlewares;
