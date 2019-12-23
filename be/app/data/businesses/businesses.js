@@ -43,10 +43,12 @@ class Businesses {
     static _getBusinessesSearchQuery(term, filters) {
         let termPattern = QueryBuilding.termPattern(term);
         let queryBuilder = QueryBuilding.getQueryBuilder();
-        let query = queryBuilder.select().from(BUSINESSES_TABLE_NAME);
-        for (let searchableField of BUSINESSES_SEARCHABLE_FIELDS) {
-            query.orWhere(searchableField, "like", termPattern);
-        }
+        let query = queryBuilder.select(BUSINESSES_TABLE_NAME+".*").from(BUSINESSES_TABLE_NAME);
+        query.where((builder) => {
+            for (let searchableField of BUSINESSES_SEARCHABLE_FIELDS) {
+                builder.orWhere(searchableField, "like", termPattern);
+            }
+        });
 
         Businesses._applyFilters(query, filters);
 
@@ -55,6 +57,9 @@ class Businesses {
 
     static _applyFilters(query, filters) {
         let joinedTables = new Set();
+        query.andWhere(builder => {
+            
+        })
         for (let filter in filters) {
             let filterData = FILTERS[filter];
             if (!filterData) {
@@ -67,10 +72,14 @@ class Businesses {
             }
             let operator = filterData.operator;
             let filterValue = filters[filter];
-            if (operator == "in" && !Array.isArray(filter)) {
-                filterValue = [filterValue];
+            if (operator == "in"){
+                filterValue = Array.isArray(filterValue) ? filterValue : [filterValue];
+                query.andWhere(inBuilder => {
+                    inBuilder.whereIn(QueryBuilding.fullFieldName(filterData.tableName, filterData.fieldName), filterValue);
+                });
+            } else {
+                inBuilder.andWhere(QueryBuilding.fullFieldName(filterData.tableName, filterData.fieldName), operator, filterValue);
             }
-            query.andWhere(QueryBuilding.fullFieldName(filterData.tableName, filterData.fieldName), operator, filterValue);
         }
     }
 

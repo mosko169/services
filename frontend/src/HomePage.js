@@ -15,13 +15,13 @@ function escapeRegexCharacters(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-  function getSuggestions(value, uri) {
+  function getSuggestions(value, uri, filters = {}) {
     const escapedValue = escapeRegexCharacters(value.trim());
     
     if (escapedValue === '') {
       return [];
     }
-    return axios.get(`${API_URL}/${uri}?term=${escapedValue}&limit=7`)
+    return axios.get(`${API_URL}/${uri}?term=${escapedValue}&filters=${encodeURIComponent(JSON.stringify(filters))}&limit=7`)
       .then(({ data }) => {
         return data
     })
@@ -107,7 +107,7 @@ class SerachServices extends Component {
   onSuggestionsFetchRequested = async ({ value }) => {
     let uri = "businesses"
     this.setState({
-      suggestions: await getSuggestions(value, uri)
+      suggestions: await getSuggestions(value, uri, {category: this.props.category})
     });
   };
 
@@ -186,8 +186,8 @@ export class SearchComponnent extends Component {
   }
 
   submitSearch = () => {
-    let uri =''
-    axios.get(`${API_URL}/${uri}?term=${escapedValue}`)
+    let uri ='/businesses'
+    axios.get(`${API_URL}/${uri}?term=${this.state.service_search}`)
       .then(({ data }) => {
         console.log(data)
     })
@@ -208,7 +208,7 @@ export class SearchComponnent extends Component {
             <label htmlFor="defaultFormRegisterEmailEx" className="grey-text">
               search service
             </label>
-              <SerachServices onSelectService={this.handleService}/>
+              <SerachServices onSelectService={this.handleService} category={this.state.category}/>
             <br />
             <label
               htmlFor="defaultFormRegisterConfirmEx"
