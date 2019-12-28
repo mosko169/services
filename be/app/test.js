@@ -6,23 +6,14 @@ const dbConn = require('./db/db_conn')
 async function main() {
     let db = await dbConn.getDBConn();
 
-    let QueryBuilder = knex({client:'pg'});
-    let term = "k%"
-    let query = QueryBuilder.select().from('businesses').where(builder => 
-        builder.where('businesses.name', 'like', term).orWhere('description', 'like', term
-    ));
+    let queryBuilder = new knex({client:'pg'});
+    let query = queryBuilder.insert({user_id: 'a@a.com', start: new Date()}).into("bookings");
+    
+            let nativeQuery = query.toSQL().toNative();
 
-    let category = "barbers";
-    if (category) {
-        query
-            .join("businesses_categories", "businesses.business_id", "=", "businesses_categories.business_id")
-            .join("categories", "businesses_categories.category_id", "=", "categories.category_id")
-            .where("categories.name", "=", category);
-    }
-    query.select("a");
-    query.select("a");
-
-    let nativeQuery = query.toSQL().toNative();
+    let upsert = `INSERT INTO ${BOOKINGS_TABLE_NAME} VALUES($1, $2, $3, $4, $5)
+                  ON CONFLICT ON CONSTRAINT bookings_pkey DO
+                  UPDATE SET user_id=$1 WHERE BOOKING
     let res = await db.query(nativeQuery.sql, nativeQuery.bindings);
     console.log(res);
 
