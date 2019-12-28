@@ -23,11 +23,11 @@ class Bookings {
         }
         
         let queryBuilder = QueryBuilding.getQueryBuilder();
-        let query = dbqueryBuilder.insert({start: start, end: end, business_id: businessId, service_id: serviceId, user_id: userDetails.userId})
+        let query = queryBuilder.insert({start: start, end: end, business_id: businessId, service_id: serviceId, user_id: userDetails.userId})
                                     .into(BOOKINGS_TABLE_NAME)
                                     .returning('booking_id');
         let res = await QueryBuilding.executePreparedQuery(dbConn, query);
-        let bookingId = res.rows[0].booking_id;
+        let bookingId = res[0].booking_id;
 
         // TODO check if booking in calendar is succesfull
         let booked = await Calendar.book(businessId, bookingId, start, end);
@@ -42,11 +42,11 @@ class Bookings {
             throw new Error(`could not set new times for booking ${bookingId}`);
         }
         let queryBuilder = QueryBuilding.getQueryBuilder();
-        updateQuery = queryBuilder(BOOKINGS_TABLE_NAME)
+        let updateQuery = queryBuilder(BOOKINGS_TABLE_NAME)
                             .where('booking_id', '=' , bookingId)
                             .andWhere('user_id', '=', userDetails.userId)
                             .update({start: newStart, end: newEnd});
-        return QueryBuilding.executePreparedQuery(updateQuery);
+        return QueryBuilding.executePreparedQuery(dbConn, updateQuery);
     }
 
     static async removeBooking(dbConn, userDetails, bookingId) {
