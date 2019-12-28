@@ -24,7 +24,7 @@ class Middlewares {
 
     static parseUserId(req, res, next) {
         let userId = req.query.userId || req.body.userId;
-        req.userDetails = {userId: userId};
+        req.userDetails = {userId: "a@a.com"};
         next();
     }
 }
