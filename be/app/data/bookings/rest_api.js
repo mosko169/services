@@ -10,7 +10,7 @@ function getBookingsRouter(dbConn) {
     let router = express.Router();
     router.use(Middlewares.parseUserId);
 
-    router.post('/bookings', async (req, res) => {
+    router.post('/', async (req, res) => {
         let businessId = req.body.businessId;
         let serviceId = req.body.serviceId;
         let start = new Date(req.body.start);
@@ -19,12 +19,12 @@ function getBookingsRouter(dbConn) {
         res.send(bookingId);    
     });
 
-    router.delete('/bookings/:bookingId', async (req, res) => {
+    router.delete('/:bookingId', async (req, res) => {
         let bookingId = await Bookings.removeBooking(dbConn, req.userDetails, req.params.bookingId);
         res.send(bookingId);    
     });
 
-    router.get('/bookings/:bookingId', async (req, res) => {
+    router.get('/:bookingId', async (req, res) => {
         let booking = await Bookings.getBooking(dbConn, req.userDetails, req.params.bookingId);
         if (!booking) {
             res.status(404);
@@ -34,7 +34,7 @@ function getBookingsRouter(dbConn) {
         res.send(booking);
     });
 
-    router.put('/bookings/:bookingId', async (req, res) => {
+    router.put('/:bookingId', async (req, res) => {
         let newData = req.body;
         await Bookings.updateBooking(dbConn, req.userDetails, req.params.bookingId, newData.start, newData.end);
     });

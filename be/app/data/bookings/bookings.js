@@ -51,14 +51,14 @@ class Bookings {
 
     static async removeBooking(dbConn, userDetails, bookingId) {
         let queryBuilder = QueryBuilding.getQueryBuilder();
-        let query = queryBuilder.delete().from(BOOKINGS_TABLE_NAME).where({booking_id: bookingId, user_id: userDetails.user_id});
+        let query = queryBuilder.delete().from(BOOKINGS_TABLE_NAME).where({booking_id: bookingId, user_id: userDetails.userId});
         await Calendar.cancelBooking(bookingId);
         return QueryBuilding.executePreparedQuery(dbConn, query);
     }
 
     static async getBooking(dbConn, userDetails, bookingId) {
         let queryBuilder = QueryBuilding.getQueryBuilder();
-        let query = queryBuilder.select().from(BOOKINGS_TABLE_NAME).where({booking_id: bookingId, user_id: userDetails.user_id});
+        let query = queryBuilder.select().from(BOOKINGS_TABLE_NAME).where({booking_id: bookingId, user_id: userDetails.userId});
         let rows = await QueryBuilding.executePreparedQuery(dbConn, query);
         if (rows.length == 0) {
             return null;

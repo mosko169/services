@@ -105,14 +105,14 @@ const CREATE_BOOKINGS_TABLE = `CREATE TABLE IF NOT EXISTS public.bookings
                                     user_id character varying COLLATE pg_catalog."default",
                                     service_id integer,
                                     business_id integer,
-                                    start timestamp(4) with time zone,
-                                    "end" timestamp(4) with time zone,
-                                    CONSTRAINT bookings_pkey PRIMARY KEY (booking_id, user_id, service_id, business_id, start, end)
-                                    CONSTRAINT business_id FOREIGN KEY (business_id)
+                                    start timestamp with time zone,
+                                    "end" timestamp with time zone,
+                                    CONSTRAINT bookings_pkey PRIMARY KEY (booking_id),
+                                    CONSTRAINT business_id FOREIGN KEY (booking_id)
                                         REFERENCES public.businesses (business_id) MATCH SIMPLE
                                         ON UPDATE NO ACTION
                                         ON DELETE NO ACTION,
-                                    CONSTRAINT service_id FOREIGN KEY (service_id)
+                                    CONSTRAINT service_id FOREIGN KEY (booking_id)
                                         REFERENCES public.services (service_id) MATCH SIMPLE
                                         ON UPDATE NO ACTION
                                         ON DELETE NO ACTION
@@ -127,7 +127,7 @@ const INIT_QUERIES = [
     CREATE_WORKERS_TABLE,
     CREATE_WORKERS_SERVICES_TABLE,
     CREATE_WORKERS_WORKING_HOURS_TABLE,
-    //CREATE_BOOKINGS_TABLE
+    CREATE_BOOKINGS_TABLE
 ];
 
 module.exports = INIT_QUERIES;
